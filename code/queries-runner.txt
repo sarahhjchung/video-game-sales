@@ -1,0 +1,24 @@
+
+-- Importing a file such as this will let you quickly create a demo to hand
+-- in. You may edit this to customize it.  For instance, you may have your
+-- data in a csv file and need a different command to load it in, you
+-- may differently named files, or you may have your queries split into more
+-- files than expected here.
+--
+\echo -------------------- Loading schema and data: -------------------- 
+\echo
+\i schema.ddl
+\i data_clean.sql
+\echo "finished importing schema and data"
+\echo  -------------------- Investigative Question 1: ------------------ 
+\echo "How does the geographical location affect the popularity of video games? Has it been the same for the past 2 decades? If not, how has it changed?"
+\i queries_1.sql
+\echo "end of question 1"
+\echo  -------------------- Investigative Question 2: ------------------ 
+\echo "Do people prefer specific genres of games on certain platforms?"
+\i queries_2.sql
+\echo "end of question 2"
+\echo  -------------------- Investigative Question 2: ------------------
+\echo "How do different publishers and platforms affect the sale of the games and what causes this to happen?"
+\i queries_3.sql
+\cho "end of question 3"

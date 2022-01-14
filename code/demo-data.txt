@@ -1,0 +1,195 @@
+--- (a) Load schema and data ---------------------------------------------
+-----
+csc343h-chungh42=> \i schema.ddl
+psql:schema.ddl:1: NOTICE:  drop cascades to 7 other objects
+DETAIL:  drop cascades to table videogame.game
+drop cascades to table videogame.gameplatform
+drop cascades to table videogame.sales
+drop cascades to table videogame.ratings
+drop cascades to table videogame.videogamesales
+drop cascades to sequence videogame.id
+drop cascades to view videogame.uniquegamenames
+DROP SCHEMA
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+
+csc343h-chungh42=> \i data_clean.sql
+SET
+psql:data_clean.sql:3: NOTICE:  table "videogamesales" does not exist, skipping
+DROP TABLE
+psql:data_clean.sql:4: NOTICE:  view "uniquegamenames" does not exist, skipping
+DROP VIEW
+psql:data_clean.sql:5: NOTICE:  sequence "id" does not exist, skipping
+DROP SEQUENCE
+CREATE TABLE
+COPY 16719
+DELETE 2
+DELETE 2483
+DELETE 2       
+CREATE SEQUENCE
+CREATE VIEW
+INSERT 0 10665
+INSERT 0 14232
+INSERT 0 14232
+INSERT 0 14232
+
+--- (b) Run \d on each table ---------------------------------------------
+-----
+csc343h-chungh42=> \d Game
+                  Table "videogame.game"
+    Column     |  Type   | Collation | Nullable | Default
+---------------+---------+-----------+----------+---------
+ gid           | integer |           | not null |
+ name          | text    |           | not null |
+ publisher     | text    |           | not null |
+ genre         | text    |           |          |
+ yearofrelease | integer |           |          |
+Indexes:
+    "game_pkey" PRIMARY KEY, btree (gid)
+Referenced by:
+    TABLE "gameplatform" CONSTRAINT "gameplatform_gid_fkey" FOREIGN KEY (gid) REFERENCES game(gid)
+
+csc343h-chungh42=> \d GamePlatform
+           Table "videogame.gameplatform"
+  Column  |  Type   | Collation | Nullable | Default
+----------+---------+-----------+----------+---------
+ gid      | integer |           | not null |
+ platform | text    |           | not null |
+Indexes:
+    "gameplatform_pkey" PRIMARY KEY, btree (gid, platform)
+Foreign-key constraints:
+    "gameplatform_gid_fkey" FOREIGN KEY (gid) REFERENCES game(gid)
+Referenced by:
+    TABLE "ratings" CONSTRAINT "ratings_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)
+    TABLE "sales" CONSTRAINT "sales_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)
+
+csc343h-chungh42=> \d Sales
+                     Table "videogame.sales"
+   Column    |       Type       | Collation | Nullable | Default
+-------------+------------------+-----------+----------+---------
+ game        | integer          |           | not null |
+ platform    | text             |           | not null |
+ nasales     | double precision |           |          |
+ jpsales     | double precision |           |          |
+ eusales     | double precision |           |          |
+ othersales  | double precision |           |          |
+ globalsales | double precision |           |          |
+Indexes:
+    "sales_pkey" PRIMARY KEY, btree (game, platform)
+Foreign-key constraints:
+    "sales_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)
+
+csc343h-chungh42=> \d Ratings
+                    Table "videogame.ratings"
+   Column    |       Type       | Collation | Nullable | Default
+-------------+------------------+-----------+----------+---------
+ game        | integer          |           | not null |
+ platform    | text             |           | not null |
+ criticscore | integer          |           |          |
+ criticcount | integer          |           |          |
+ userscore   | double precision |           |          |
+ usercount   | integer          |           |          |
+Indexes:
+    "ratings_pkey" PRIMARY KEY, btree (game, platform)
+Foreign-key constraints:
+    "ratings_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)
+
+--- (c) Run SELECT count(*) on each table --------------------------------
+-----
+csc343h-chungh42=> SELECT count(*) FROM Game;
+ count
+-------
+ 10665
+(1 row)
+
+csc343h-chungh42=> SELECT count(*) FROM GamePlatform;
+ count
+-------
+ 14232
+(1 row)
+
+csc343h-chungh42=> SELECT count(*) FROM Sales;
+ count
+-------
+ 14232
+(1 row)
+
+csc343h-chungh42=> SELECT count(*) FROM Ratings;
+ count
+-------
+ 14232
+(1 row)
+
+--- (d) Show some rows from each table -----------------------------------
+-----
+csc343h-chungh42=> SELECT * FROM Game WHERE yearOfRelease=2016 LIMIT 10;
+ gid |                 name                  |          publisher           |   genre    | yearofrelease 
+-----+---------------------------------------+------------------------------+------------+---------------
+  34 | Norn + Nonette: Act Tune              | Idea Factory                 | Action     |          2016
+  62 | Zero Escape: Zero Time Dilemma        | Aksys Games                  | Adventure  |          2016
+  88 | Mark McMorris Infinite Air            | FuRyu Corporation            | Sports     |          2016
+ 126 | My Hero Academia: Battle for All      | Namco Bandai Games           | Action     |          2016
+ 150 | Anima - Gate of Memories              | Avanquest                    | Action     |          2016
+ 155 | Sherlock Holmes: The Devil's Daughter | Bigben Interactive           | Adventure  |          2016
+ 171 | Teddy Together                        | Nintendo                     | Simulation |          2016
+ 204 | Forza Horizon 3                       | Microsoft Game Studios       | Racing     |          2016
+ 244 | Rose to Tasogare no Kojou             | Nippon Ichi Software         | Action     |          2016
+ 253 | Pro Evolution Soccer 2017             | Konami Digital Entertainment | Sports     |          2016
+(10 rows)
+
+csc343h-chungh42=> SELECT * FROM GamePlatform WHERE gID < 5;
+ gid | platform
+-----+----------
+   1 | DS
+   1 | PC
+   1 | PS2
+   1 | PS3
+   1 | PSP
+   1 | X360
+   2 | PC
+   3 | PC
+   3 | PS3
+   3 | PS4
+   3 | WiiU
+   3 | X360
+   3 | XOne
+   4 | PC
+   4 | PS
+(15 rows)
+
+csc343h-chungh42=> SELECT * FROM Sales WHERE NASales > 10;
+ game  | platform | nasales | jpsales | eusales | othersales | globalsales 
+-------+----------+---------+---------+---------+------------+-------------
+  1961 | NES      |   26.93 |    0.28 |    0.63 |       0.47 |       28.31
+  3299 | X360     |      15 |    0.24 |    4.89 |       1.69 |       21.81
+  6851 | Wii      |   15.68 |    3.79 |   12.76 |       3.29 |       35.52
+  7663 | DS       |   11.28 |     6.5 |    9.14 |       2.88 |        29.8
+ 10641 | Wii      |   14.44 |     4.7 |    6.94 |       2.24 |       28.32
+  1446 | GB       |   11.27 |   10.22 |    8.89 |          1 |       31.37
+  6368 | GB       |   10.83 |    4.18 |    2.71 |       0.42 |       18.14
+    54 | Wii      |   13.96 |    2.93 |    9.18 |       2.84 |       28.92
+  5590 | Wii      |   41.36 |    3.77 |   28.96 |       8.45 |       82.53
+  4000 | Wii      |   15.61 |    3.28 |   10.93 |       2.95 |       32.77
+(10 rows)
+
+csc343h-chungh42=> SELECT * FROM Ratings WHERE userScore < 1;
+ game | platform | criticscore | criticcount | userscore | usercount 
+------+----------+-------------+-------------+-----------+-----------
+ 9784 | Wii      |             |             |       0.3 |         4
+ 3496 | XB       |          39 |          20 |       0.5 |         8
+  992 | PSP      |          28 |          16 |       0.9 |        50
+ 1759 | DS       |             |             |       0.3 |         9
+ 6886 | DS       |             |             |       0.9 |         7
+ 5353 | Wii      |             |             |       0.6 |         5
+ 7931 | PS3      |             |             |       0.2 |         5
+ 7931 | X360     |             |             |       0.7 |         6
+ 5777 | DS       |             |             |         0 |         4
+ 3193 | Wii      |             |             |       0.2 |         5
+ 7235 | Wii      |          32 |          13 |       0.7 |         6
+ 1577 | PS3      |          36 |          10 |       0.5 |         4
+ 1750 | PSP      |          72 |           7 |       0.6 |        24
+(13 rows)

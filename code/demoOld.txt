@@ -1,0 +1,158 @@
+-- PART A: load data and schema
+\i schema.ddl
+\i data_clean.sql
+
+-- PART B: run \d for each table
+\d Game
+\d GamePlatform
+\d Sales
+\d Ratings
+
+-- PART C: run SELECT count(*) on each table
+SELECT count(*) FROM Game;
+SELECT count(*) FROM GamePlatform;
+SELECT count(*) FROM Sales;
+SELECT count(*) FROM Ratings;
+
+-- PART D: run SELECT * on each table
+SELECT * FROM Game LIMIT 10;
+SELECT * FROM GamePlatform LIMIT 10;
+SELECT * FROM Sales LIMIT 10;
+SELECT * FROM Ratings LIMIT 10;
+
+
+-- PART B OUTPUT:
+                 Table "videogame.game"
+    Column     |  Type   | Collation | Nullable | Default
+---------------+---------+-----------+----------+---------
+ gid           | integer |           | not null |
+ name          | text    |           | not null |
+ publisher     | text    |           | not null |
+ genre         | text    |           |          |
+ yearofrelease | integer |           |          |
+Indexes:
+    "game_pkey" PRIMARY KEY, btree (gid)
+Referenced by:
+    TABLE "gameplatform" CONSTRAINT "gameplatform_gid_fkey" FOREIGN KEY (gid) REFERENCES game(gid)
+
+           Table "videogame.gameplatform"
+  Column  |  Type   | Collation | Nullable | Default
+----------+---------+-----------+----------+---------
+ gid      | integer |           | not null |
+ platform | text    |           | not null |
+Indexes:
+    "gameplatform_pkey" PRIMARY KEY, btree (gid, platform)
+Foreign-key constraints:
+    "gameplatform_gid_fkey" FOREIGN KEY (gid) REFERENCES game(gid)
+Referenced by:
+    TABLE "ratings" CONSTRAINT "ratings_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)
+    TABLE "sales" CONSTRAINT "sales_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)
+
+                     Table "videogame.sales"
+   Column    |       Type       | Collation | Nullable | Default
+-------------+------------------+-----------+----------+---------
+ game        | integer          |           | not null |
+ platform    | text             |           | not null |
+ nasales     | double precision |           |          |
+ jpsales     | double precision |           |          |
+ eusales     | double precision |           |          |
+ othersales  | double precision |           |          |
+ globalsales | double precision |           |          |
+Indexes:
+    "sales_pkey" PRIMARY KEY, btree (game, platform)
+Foreign-key constraints:
+    "sales_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)     
+
+                    Table "videogame.ratings"
+   Column    |       Type       | Collation | Nullable | Default
+-------------+------------------+-----------+----------+---------
+ game        | integer          |           | not null |
+ platform    | text             |           | not null |
+ criticscore | integer          |           |          |
+ criticcount | integer          |           |          |
+ userscore   | double precision |           |          |
+ usercount   | integer          |           |          |
+Indexes:
+    "ratings_pkey" PRIMARY KEY, btree (game, platform)
+Foreign-key constraints:
+    "ratings_game_fkey" FOREIGN KEY (game, platform) REFERENCES gameplatform(gid, platform)   
+
+
+-- PART C OUTPUT
+ count
+-------
+ 10665
+(1 row)
+
+ count
+-------
+ 14232
+(1 row)
+
+ count
+-------
+ 14232
+(1 row)
+
+ count
+-------
+ 14232
+(1 row)
+
+
+-- PART D OUTPUT
+ gid |            name             |      publisher      |   genre    | yearofrelease
+-----+-----------------------------+---------------------+------------+---------------        
+   1 | Juiced 2: Hot Import Nights | THQ                 | Racing     |          2007
+   2 | The Sims: Unleashed         | Electronic Arts     | Simulation |          2002
+   3 | Call of Duty: Ghosts        | Activision          | Shooter    |          2013
+   4 | Tomb Raider II              | Eidos Interactive   | Action     |          1997
+   5 | Trapped Dead                | Iceberg Interactive | Strategy   |          2011
+   6 | WarJetz                     | 3DO                 | Shooter    |          2001
+   7 | Suzumiya Haruhi no Gekidou  | Kadokawa Shoten     | Adventure  |          2009
+   8 | Farming Simulator 2011      | N/A                 | Simulation |          2010
+   9 | 2014 FIFA World Cup Brazil  | Electronic Arts     | Sports     |          2014
+  10 | Prince of Persia            | Ubisoft             | Action     |          2008
+(10 rows)
+
+ gid | platform
+-----+----------
+   1 | DS
+   1 | PC
+   1 | PS2
+   1 | PS3
+   1 | PSP
+   1 | X360
+   2 | PC
+   3 | PC
+   3 | PS3
+   3 | PS4
+(10 rows)
+
+ game | platform | nasales | jpsales | eusales | othersales | globalsales
+------+----------+---------+---------+---------+------------+-------------
+ 7043 | 3DS      |       0 |    0.03 |       0 |          0 |        0.03
+ 7447 | 3DS      |    0.81 |    0.52 |    0.23 |       0.11 |        1.68
+ 3335 | 3DS      |    0.27 |       0 |    0.27 |       0.05 |         0.6
+ 3335 | DS       |    0.21 |       0 |    0.26 |       0.04 |        0.52
+ 7004 | 3DS      |       0 |    0.04 |       0 |          0 |        0.04
+ 8378 | PS3      |     0.2 |    0.45 |    0.12 |       0.07 |        0.84
+ 4576 | PS       |    0.15 |    0.12 |     0.1 |       0.03 |        0.41
+ 7149 | PS2      |       0 |    0.17 |       0 |          0 |        0.17
+ 1322 | PS2      |    0.11 |       0 |    0.09 |       0.03 |        0.23
+ 4520 | PS2      |       0 |    0.16 |       0 |          0 |        0.16
+(10 rows)
+
+ game | platform | criticscore | criticcount | userscore | usercount
+------+----------+-------------+-------------+-----------+-----------
+ 7043 | 3DS      |             |             |           |
+ 7447 | 3DS      |             |             |           |
+ 3335 | 3DS      |             |             |           |
+ 3335 | DS       |             |             |           |
+ 7004 | 3DS      |             |             |           |
+ 8378 | PS3      |          71 |          59 |       7.9 |       216
+ 4576 | PS       |             |             |           |
+ 7149 | PS2      |             |             |           |
+ 1322 | PS2      |             |             |           |
+ 4520 | PS2      |             |             |           |
+(10 rows)
